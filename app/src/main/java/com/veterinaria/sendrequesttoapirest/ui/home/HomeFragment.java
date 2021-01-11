@@ -1,13 +1,17 @@
 package com.veterinaria.sendrequesttoapirest.ui.home;
 
+import android.content.ContentUris;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +36,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 import retrofit2.Call;
@@ -87,10 +92,12 @@ public class HomeFragment extends Fragment {
     }
 
     private void takePhoto() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        /*Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(root.getContext().getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        }
+        }*/
+        Intent pickPhoto= new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickPhoto,1);
 
     }
 
@@ -154,15 +161,47 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+        /*if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             imagen.setImageBitmap(imageBitmap);
             ByteArrayOutputStream array= new ByteArrayOutputStream();
             imageBitmap.compress(Bitmap.CompressFormat.JPEG,100,array);
-            imageByte= array.toByteArray();
+            imageByte= array.toByteArray();*/
             /*Bitmap b= BitmapFactory.decodeByteArray(imageByte,0,imageByte.length);
             imagen.setImageBitmap(b);*/
+        //}
+        if(resultCode==RESULT_OK && data!=null){
+            Uri selecUri= data.getData();
+            Bitmap bitmap;
+            String [] file={MediaStore.Images.Media.DATA};
+            if(selecUri!=null){
+                Cursor cursor= root.getContext().getContentResolver().query(selecUri,file,null,null,null);
+                if(cursor!=null){
+                    cursor.moveToFirst();
+                    if (Build.VERSION.SDK_INT >= 29) {
+                        // You can replace '0' by 'cursor.getColumnIndex(MediaStore.Images.ImageColumns._ID)'
+                        // Note that now, you read the column '_ID' and not the column 'DATA'
+                        Uri imageUri= ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cursor.getInt(0));
+
+                        // now that you have the media URI, you can decode it to a bitmap
+                        try (ParcelFileDescriptor pfd = root.getContext().getContentResolver().openFileDescriptor(selecUri, "r")) {
+                            if (pfd != null) {
+                                bitmap = BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor());
+                                imagen.setImageBitmap(bitmap);
+                                cursor.close();
+                            }
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                    } else {
+                        int columnIndex = cursor.getColumnIndex(file[0]);
+                        String picturePath = cursor.getString(columnIndex);
+                        imagen.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+                        cursor.close();
+                    }
+                }
+            }
         }
 
     }
