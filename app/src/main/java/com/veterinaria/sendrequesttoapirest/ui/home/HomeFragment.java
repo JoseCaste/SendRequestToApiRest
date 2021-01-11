@@ -180,11 +180,7 @@ public class HomeFragment extends Fragment {
                 if(cursor!=null){
                     cursor.moveToFirst();
                     if (Build.VERSION.SDK_INT >= 29) {
-                        // You can replace '0' by 'cursor.getColumnIndex(MediaStore.Images.ImageColumns._ID)'
-                        // Note that now, you read the column '_ID' and not the column 'DATA'
-                        Uri imageUri= ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cursor.getInt(0));
-
-                        // now that you have the media URI, you can decode it to a bitmap
+                        //Uri imageUri= ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cursor.getInt(0));
                         try (ParcelFileDescriptor pfd = root.getContext().getContentResolver().openFileDescriptor(selecUri, "r")) {
                             if (pfd != null) {
                                 bitmap = BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor());
