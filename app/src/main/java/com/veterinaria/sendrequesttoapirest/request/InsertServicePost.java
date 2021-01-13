@@ -9,6 +9,8 @@ public class InsertServicePost {
     private String at;
     @SerializedName("service")
     private Service service;
+    @SerializedName("data")
+    private String data;
 
     public String getAt() {
         return at;
@@ -26,5 +28,12 @@ public class InsertServicePost {
         this.service = service;
     }
 
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
 }
 

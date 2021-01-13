@@ -4,52 +4,8 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Service {
-   /* private int id;
-
-    private String title;
-    private String body;
-    private int userId;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    @Override
-    public String toString() {
-        return "Service{" +
-                "title='" + title + '\'' +
-                ", body='" + body + '\'' +
-                ", userId=" + userId +
-                '}';
-    }*/
+    @SerializedName("id")
+    private Long id;
     @SerializedName("nombrePerro")
     private String nombrePerro;
     @SerializedName("responsable")
@@ -61,14 +17,20 @@ public class Service {
     @SerializedName("numTel")
     private String numTel;
     @SerializedName("precio")
-    private Double precio;
+    private int precio;
     @SerializedName("fecha")
     private String fecha;
-    @SerializedName("data")
-    private byte[] data;
     @SerializedName("at")
     private Object at;
 
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Object getAt() {
         return at;
@@ -118,11 +80,11 @@ public class Service {
         this.numTel = numTel;
     }
 
-    public Double getPrecio() {
+    public int getPrecio() {
         return precio;
     }
 
-    public void setPrecio(Double precio) {
+    public void setPrecio(int precio) {
         this.precio = precio;
     }
 
@@ -133,18 +95,10 @@ public class Service {
     public void setFecha(String fecha) {
         this.fecha = fecha;
     }
-
-    public byte[] getData() {
-        return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
-    }
-
     @Override
     public String toString() {
         return "Service{" +
+                "id='" + id + '\'' +
                 "nombrePerro='" + nombrePerro + '\'' +
                 ", responsable='" + responsable + '\'' +
                 ", servicio='" + servicio + '\'' +
@@ -152,7 +106,7 @@ public class Service {
                 ", numTel='" + numTel + '\'' +
                 ", precio=" + precio +
                 ", fecha='" + fecha + '\'' +
-                ", data=" + data +
+                //", data=" + data +
                 '}';
     }
 }
