@@ -3,6 +3,8 @@ package com.veterinaria.sendrequesttoapirest.request;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.sql.Blob;
+
 public class Service {
     @SerializedName("id")
     private Long id;
@@ -20,8 +22,12 @@ public class Service {
     private int precio;
     @SerializedName("fecha")
     private String fecha;
+    @SerializedName("data")
+    private String data;
     @SerializedName("at")
     private Object at;
+    @SerializedName("imgBase64")
+    private String imgaBase64;
 
 
     public Long getId() {
@@ -30,6 +36,22 @@ public class Service {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String  getData() {
+        return data;
+    }
+
+    public void setData(String  data) {
+        this.data = data;
+    }
+
+    public String getImgaBase64() {
+        return imgaBase64;
+    }
+
+    public void setImgaBase64(String imgaBase64) {
+        this.imgaBase64 = imgaBase64;
     }
 
     public Object getAt() {
@@ -106,7 +128,7 @@ public class Service {
                 ", numTel='" + numTel + '\'' +
                 ", precio=" + precio +
                 ", fecha='" + fecha + '\'' +
-                //", data=" + data +
+                ", data=" + data +
                 '}';
     }
 }

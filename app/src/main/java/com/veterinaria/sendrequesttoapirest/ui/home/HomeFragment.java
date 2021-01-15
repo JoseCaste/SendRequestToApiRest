@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,10 @@ import com.veterinaria.sendrequesttoapirest.R;
 import com.veterinaria.sendrequesttoapirest.request.FileUtils;
 import com.veterinaria.sendrequesttoapirest.request.InsertServicePost;
 import com.veterinaria.sendrequesttoapirest.request.Service;
+import com.veterinaria.sendrequesttoapirest.request.ServiceWithImage;
 import com.veterinaria.sendrequesttoapirest.services.PostServices;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -55,6 +59,7 @@ public class HomeFragment extends Fragment {
     TextView txtPrecio;
     PostServices postServices;
     ImageView imagen;
+    ImageView imagenRecuperada;
     View root;
     String urlImage;
     Long idService;
@@ -74,6 +79,7 @@ public class HomeFragment extends Fragment {
         txtPrecio=root.findViewById(R.id.txtPrecio);
         btnSolicitar=root.findViewById(R.id.btnSolicitar);
         imagen=root.findViewById(R.id.imgPerro);
+        imagenRecuperada=root.findViewById(R.id.imgRecuperada);
         imagen.setOnClickListener(v -> {
             takePhoto();
         });
@@ -105,6 +111,7 @@ public class HomeFragment extends Fragment {
         service.setPrecio(Integer.parseInt(txtPrecio.getText().toString()));
         service.setServicio(spiner.getSelectedItem().toString());
         service.setNumTel(txtNumTel.getText().toString());
+        service.setImgaBase64(getImageViewBase54());
         System.out.println("*******2"+service.toString());
         HashMap<String, Object> mapa= new HashMap<>();
 
@@ -114,7 +121,8 @@ public class HomeFragment extends Fragment {
         mapa.put("precio",service.getPrecio());
         mapa.put("servicio",service.getServicio());
         mapa.put("numTel",service.getNumTel());
-        System.out.println("mapa "+mapa.toString());
+        mapa.put("imgBase64",service.getImgaBase64());
+        //System.out.println("mapa "+mapa.toString());
         /**cuerpo del file**/
         File file= FileUtils.getFile(root.getContext(),selecUri);
         RequestBody requestFile= RequestBody.create(MediaType.parse(root.getContext().getContentResolver().getType(selecUri)),file);
@@ -131,15 +139,19 @@ public class HomeFragment extends Fragment {
             public void onResponse(Call<InsertServicePost> call, Response<InsertServicePost> response) {
                 System.out.println("On response "+" "+response.body().getAt()+" "+response.body().getService().toString()+" "+response.body().getData());
                 idService=response.body().getService().getId();
-                Call<InsertServicePost> call2= postServices.insertImageService(idService,bodyFile);
-                call2.enqueue(new Callback<InsertServicePost>() {
+                Call<ServiceWithImage> call2= postServices.insertImageService(idService,bodyFile);
+                call2.enqueue(new Callback<ServiceWithImage>() {
                     @Override
-                    public void onResponse(Call<InsertServicePost> call, Response<InsertServicePost> response) {
-                        System.out.println("String recibido: "+response.body().getService()+"data "+response.body().getData());
+                    public void onResponse(Call<ServiceWithImage> call, Response<ServiceWithImage> response) {
+                        System.out.println("String recibido: "+response.body().getService()+"status "+response.body().getStatus()+" "+response.body().getMessage());
+                        String base64=response.body().getService().getData();
+                        byte [] arrayByte=Base64.decode(base64,Base64.DEFAULT);
+                        Bitmap mapaImg=BitmapFactory.decodeByteArray(arrayByte,0,arrayByte.length);
+                        imagenRecuperada.setImageBitmap(mapaImg);
                     }
 
                     @Override
-                    public void onFailure(Call<InsertServicePost> call, Throwable t) {
+                    public void onFailure(Call<ServiceWithImage> call, Throwable t) {
                         System.out.println("fallo recibido: "+call.toString()+"--> "+t.getMessage());
                     }
                 });
@@ -152,6 +164,15 @@ public class HomeFragment extends Fragment {
             }
         });
 
+    }
+
+    private String getImageViewBase54() {
+        imagen.buildDrawingCache();
+        Bitmap bit= imagen.getDrawingCache();
+        ByteArrayOutputStream byteArrayOutputStream= new ByteArrayOutputStream();
+        bit.compress(Bitmap.CompressFormat.JPEG,40,byteArrayOutputStream);
+        byte[] arrayByte=byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(arrayByte,Base64.DEFAULT);
     }
 
     @Override
