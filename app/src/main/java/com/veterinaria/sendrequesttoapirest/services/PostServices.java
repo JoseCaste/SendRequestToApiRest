@@ -1,6 +1,8 @@
 package com.veterinaria.sendrequesttoapirest.services;
 
 import com.veterinaria.sendrequesttoapirest.request.InsertServicePost;
+import com.veterinaria.sendrequesttoapirest.request.ServiceWithImage;
+
 import java.util.HashMap;
 import okhttp3.MultipartBody;
 import retrofit2.Call;
@@ -14,7 +16,7 @@ import retrofit2.http.Path;
 public interface PostServices {
     @Multipart
     @POST("insertImageService/{id}")
-    Call<InsertServicePost> insertImageService(@Path("id") Long id, @Part MultipartBody.Part file);
+    Call<ServiceWithImage> insertImageService(@Path("id") Long id, @Part MultipartBody.Part file);
 
     @POST("insertService2")
     Call<InsertServicePost> createService(@Body HashMap<String, Object> service);
